@@ -26,11 +26,18 @@ export const Rizzy = {
         ? document.createTextNode(element.props.nodeValue)
         : document.createElement(element.type);
     
+    const isProperty = (key: string) => key !== "children";
+    
+    Object.keys(element.props)
+      .filter(isProperty)
+      .forEach(name => {
+        dom[name] = element.props[name];
+      })
+    
     element.props.children.forEach((child: any) => {
       this.render(child , dom);
     })
     
     container?.appendChild(dom);
   }
-
 }
