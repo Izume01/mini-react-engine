@@ -12,24 +12,43 @@ export const Rizzy = {
    * we will map through the children and if its a string we will create a text element else we will return the child as it is
    * @returns 
    */
-  createElement(type: string, prop: any, ...children: any[]) {
+  createElement(type: string, prop: any, ...children: any[]) {    
+    
+    
+    const normalize = (child: any): any  => {
+        
+      if (child === null || child === false || child === true) {
+        return null
+      }
+      
+      if (Array.isArray(child)) {
+        return child.map(normalize)
+      }
+      
+      if (typeof child === "object") {
+        return child
+      } 
+      
+      return {
+        type: "TEXT_ELEMENT", 
+        props: {
+          nodeValue: child,
+          children: []
+        }
+      }
+    }
+    
+    let normalizeChildren = 
+      children
+        .map(normalize)
+        .flat()
+        .filter(Boolean)
+    
     return {
       type,
       props: {
         ...(prop || {}),
-        children: children.map(child => {
-          if (typeof child === "object") {
-            return child
-          } else {
-            return {
-              type: "TEXT_ELEMENT",
-              props: {
-                nodeValue: child,
-                children: []
-              }
-            }
-          }
-        })
+        children: normalizeChildren
       }
     }
   },
@@ -57,7 +76,16 @@ export const Rizzy = {
     Object.keys(element.props)
       .filter(isProperty)
       .forEach(name => {
-        dom[name] = element.props[name];
+        const value = element.props[name];
+
+        if (name === "style" && typeof value === "object") {
+          Object.assign(dom.style, value);
+        } 
+        else if (name === "className") {
+          dom.className = value;
+        } else {
+            dom[name] = value;  
+        }
       })
     
     /**
