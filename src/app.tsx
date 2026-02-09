@@ -1,6 +1,5 @@
 import { Rizzy } from "./runtime";
 
-
 /** @jsx Rizzy.createElement */
 const element = (
   <div>
